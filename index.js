@@ -1,6 +1,6 @@
-const pkg = require(process.pwd() + "package.json");
+const pkg = require(process.cwd() + "/package.json");
 const banner = `/*
-Copyright (c) 2017 ${pkg.author}
+Copyright (c) 2019 ${pkg.author}
 name: ${pkg.name}
 license: ${pkg.license}
 author: ${pkg.author}
@@ -30,7 +30,7 @@ const uglifyFunction = eval(`(function () {
     var type = comment.type;
     if (type === "comment2") {
       // multiline comment
-      return /name:\s${pkg.name.replace(/\//g, "\\/")}/.test(text);
+      return /name:(\\s*)${pkg.name.replace(/\//g, "\\/")}/g.test(text);
     }
   }
 })();`);
@@ -54,7 +54,7 @@ module.exports = function config(options) {
   const {
     input,
     output, // string | string[]
-    format, // "umd", "cjs", "es"
+    format = "umd", // "umd", "cjs", "es"
     exports = "default", // "default", "named"
     sourcemp, // boolean,
     name, // string,
@@ -77,7 +77,7 @@ module.exports = function config(options) {
   return {
     input,
     plugins,
-    external: Object.keys(external),
+    external: Object.keys(external || {}),
     output: {
       banner,
       format: "es",
