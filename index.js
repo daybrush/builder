@@ -1,5 +1,5 @@
 const pkg = require(process.cwd() + "/package.json");
-const banner = `/*
+const defaultBanner = `/*
 Copyright (c) 2019 ${pkg.author}
 name: ${pkg.name}
 license: ${pkg.license}
@@ -22,24 +22,7 @@ const replacePlugin = require("rollup-plugin-replace")({
 });
 const minifyPlugin = require("rollup-plugin-prototype-minify")({ sourcemap: true })
 const resolvePlugin = require("rollup-plugin-node-resolve")();
-
-
-const uglifyFunction = eval(`(function () {
-  return function (node, comment) {
-    var text = comment.value;
-    var type = comment.type;
-    if (type === "comment2") {
-      // multiline comment
-      return /name:(\\s*)${pkg.name.replace(/\//g, "\\/")}/g.test(text);
-    }
-  }
-})();`);
-const uglifyPlugin = require("rollup-plugin-uglify").uglify({
-  sourcemap: true,
-  output: {
-    comments: uglifyFunction,
-  },
-});
+const uglifyPlugin = require("rollup-plugin-uglify").uglify;
 
 module.exports = function config(options) {
   if (Array.isArray(options)) {
@@ -56,17 +39,38 @@ module.exports = function config(options) {
     output, // string | string[]
     format = "umd", // "umd", "cjs", "es"
     exports = "default", // "default", "named"
-    sourcemp, // boolean,
+    sourcemap, // boolean,
     name, // string,
-    uglify, // boolean
+    uglify, // boolean or except string
     resolve, // boolean
     visualizer, //  options
     external, // {object}
+    inputOptions, // other input options
+    outputOptions, // other output options
+    banner = defaultBanner,
   } = options;
   const plugins = [typescriptPlugin, minifyPlugin, replacePlugin];
 
   resolve && plugins.push(resolvePlugin);
-  uglify && plugins.push(uglifyPlugin);
+  if (uglify) {
+    const condition = typeof uglify === "string" ? uglify : `name:(\\s*)${pkg.name.replace(/\//g, "\\/")}`;
+    const uglifyFunction = eval(`(function () {
+      return function (node, comment) {
+        var text = comment.value;
+        var type = comment.type;
+        if (type === "comment2") {
+        // multiline comment
+          return /${condition}/g.test(text);
+        }
+      }
+      })();`);
+    plugins.push(uglifyPlugin({
+      sourcemap: true,
+      output: {
+        comments: uglifyFunction,
+      },
+    }));
+  }
   visualizer && plugins.push(visualizerPlugin({
     sourcemap: true,
     filename: './statistics/scene.min.html',
@@ -78,6 +82,7 @@ module.exports = function config(options) {
     input,
     plugins,
     external: Object.keys(external || {}),
+    ...inputOptions,
     output: {
       banner,
       format: "es",
@@ -89,7 +94,8 @@ module.exports = function config(options) {
       name,
       exports,
       file: output,
-      sourcemap: sourcemp,
+      sourcemap,
+      ...outputOptions,
     },
   };
 }
