@@ -39,7 +39,7 @@ module.exports = function config(options) {
     output, // string | string[]
     format = "umd", // "umd", "cjs", "es"
     exports = "default", // "default", "named"
-    sourcemap, // boolean,
+    sourcemap = true, // boolean,
     name, // string,
     uglify, // boolean or except string
     resolve, // boolean
