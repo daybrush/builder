@@ -7,6 +7,8 @@ author: ${pkg.author}
 repository: ${pkg.repository.url}
 version: ${pkg.version}
 */`;
+const commonjsPlugin = require("rollup-plugin-commonjs")();
+
 const typescriptPlugin = require("rollup-plugin-typescript")({
   "module": "es2015",
   "target": "es3",
@@ -43,6 +45,7 @@ module.exports = function config(options) {
     name, // string,
     uglify, // boolean or except string
     resolve, // boolean
+    commonjs, // boolean,
     visualizer, //  options
     external, // {object}
     inputOptions, // other input options
@@ -51,6 +54,7 @@ module.exports = function config(options) {
   } = options;
   const plugins = [typescriptPlugin, minifyPlugin, replacePlugin];
 
+  commonjs && plugins.push(commonjsPlugin);
   resolve && plugins.push(resolvePlugin);
   if (uglify) {
     const condition = typeof uglify === "string" ? uglify : `name:(\\s*)${pkg.name.replace(/\//g, "\\/")}`;
