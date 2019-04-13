@@ -25,6 +25,7 @@ const replacePlugin = require("rollup-plugin-replace")({
 const minifyPlugin = require("rollup-plugin-prototype-minify")({ sourcemap: true })
 const resolvePlugin = require("rollup-plugin-node-resolve")();
 const uglifyPlugin = require("rollup-plugin-uglify").uglify;
+const visualizerPlugin = require("rollup-plugin-visualizer");
 
 module.exports = function config(options) {
   if (Array.isArray(options)) {
@@ -77,9 +78,9 @@ module.exports = function config(options) {
   }
   visualizer && plugins.push(visualizerPlugin({
     sourcemap: true,
-    filename: './statistics/scene.min.html',
-    title: 'scene.min.js',
-    ...visualizer,
+    filename: './statistics/index.html',
+    title: '',
+    ...visualizer ,
   }));
 
   return {
