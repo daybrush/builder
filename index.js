@@ -1,21 +1,26 @@
+const fs = require("fs");
 const pkg = require(process.cwd() + "/package.json");
+
+let copyright = `Copyright (c) ${pkg.author ? pkg.author.name || pkg.author : ""}`;
+try {
+  const licenseFile = fs.readFileSync(process.cwd() + "/LICENSE", { encoding: "utf8" });
+  const result = licenseFile.match(/^copy.*$/img);
+
+  if (result && result[0]) {
+    copyright = result[0];
+  }
+
+} catch (e) { }
 const defaultBanner = `/*
-Copyright (c) 2019 ${pkg.author}
+${copyright}
 name: ${pkg.name}
 license: ${pkg.license}
-author: ${pkg.author}
+author: ${pkg.author ? pkg.author.name || pkg.author : ""}
 repository: ${pkg.repository.url}
 version: ${pkg.version}
 */`;
 const commonjsPlugin = require("rollup-plugin-commonjs")();
-
-const typescriptPlugin = require("rollup-plugin-typescript")({
-  "module": "es2015",
-  "target": "es3",
-  "lib": ["es2015", "dom"],
-  "exclude": "node_modules/**",
-  "sourceMap": true,
-});
+const typescriptPlugin = require("rollup-plugin-typescript");
 const replacePlugin = require("rollup-plugin-replace")({
   "#__VERSION__#": pkg.version,
   "/** @class */": "/*#__PURE__*/",
@@ -40,9 +45,11 @@ module.exports = function config(options) {
   const {
     input,
     output, // string | string[]
+    tsconfig = "tsconfig.json",
     format = "umd", // "umd", "cjs", "es"
     exports = "default", // "default", "named"
     sourcemap = true, // boolean,
+    plugins = [],
     name, // string,
     uglify, // boolean or except string
     resolve, // boolean
@@ -53,10 +60,17 @@ module.exports = function config(options) {
     outputOptions, // other output options
     banner = defaultBanner,
   } = options;
-  const plugins = [typescriptPlugin, minifyPlugin, replacePlugin];
+  const nextPlugins = plugins.concat([
+    typescriptPlugin({
+      tsconfig,
+      "sourceMap": true,
+    }),
+    minifyPlugin,
+    replacePlugin
+  ]);
 
-  commonjs && plugins.push(commonjsPlugin);
-  resolve && plugins.push(resolvePlugin);
+  commonjs && nextPlugins.push(commonjsPlugin);
+  resolve && nextPlugins.push(resolvePlugin);
   if (uglify) {
     const condition = typeof uglify === "string" ? uglify : `name:(\\s*)${pkg.name.replace(/\//g, "\\/")}`;
     const uglifyFunction = eval(`(function () {
@@ -69,23 +83,23 @@ module.exports = function config(options) {
         }
       }
       })();`);
-    plugins.push(uglifyPlugin({
+    nextPlugins.push(uglifyPlugin({
       sourcemap: true,
       output: {
         comments: uglifyFunction,
       },
     }));
   }
-  visualizer && plugins.push(visualizerPlugin({
+  visualizer && nextPlugins.push(visualizerPlugin({
     sourcemap: true,
     filename: './statistics/index.html',
     title: '',
-    ...visualizer ,
+    ...visualizer,
   }));
 
   return {
     input,
-    plugins,
+    plugins: nextPlugins,
     external: Object.keys(external || {}),
     ...inputOptions,
     output: {
