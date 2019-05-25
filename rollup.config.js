@@ -1,10 +1,10 @@
 import typescript from 'rollup-plugin-typescript';
-import PrototypeMinify from "rollup-plugin-prototype-minify";
+import PrototypeMinify from "@daybrush/rollup-plugin-prototype-minify";
 import replace from "rollup-plugin-replace";
 import { uglify } from "rollup-plugin-uglify";
 import resolve from "rollup-plugin-node-resolve";
 import visualizer from 'rollup-plugin-visualizer';
- 
+
 
 const pkg = require("./package.json");
 const banner = require("./config/banner");
