@@ -1,6 +1,6 @@
 {
   "name": "@daybrush/builder",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/daybrush/builder#readme",
   "dependencies": {
-    "@daybrush/rollup-plugin-prototype-minify": "^1.1.0",
+    "@daybrush/rollup-plugin-prototype-minify": "^1.1.2",
     "rollup": "^1.7.4",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-node-resolve": "^4.0.1",
