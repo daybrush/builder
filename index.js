@@ -27,7 +27,7 @@ const replacePlugin = require("rollup-plugin-replace")({
   delimiters: ["", ""],
   sourcemap: true,
 });
-const minifyPlugin = require("rollup-plugin-prototype-minify")({ sourcemap: true })
+const minifyPlugin = require("@daybrush/rollup-plugin-prototype-minify")({ sourcemap: true })
 const resolvePlugin = require("rollup-plugin-node-resolve")();
 const uglifyPlugin = require("rollup-plugin-uglify").uglify;
 const visualizerPlugin = require("rollup-plugin-visualizer");
