@@ -19,18 +19,17 @@ author: ${pkg.author ? pkg.author.name || pkg.author : ""}
 repository: ${pkg.repository.url}
 version: ${pkg.version}
 */`;
-const commonjsPlugin = require("rollup-plugin-commonjs")();
-const typescriptPlugin = require("rollup-plugin-typescript");
-const replacePlugin = require("rollup-plugin-replace")({
+const commonjsPlugin = require("@rollup/plugin-commonjs")();
+const typescriptPlugin = require("@rollup/plugin-typescript");
+const replacePlugin = require("@rollup/plugin-replace")({
   "#__VERSION__#": pkg.version,
   "/** @class */": "/*#__PURE__*/",
   delimiters: ["", ""],
   sourcemap: true,
 });
-const minifyPlugin = require("rollup-plugin-prototype-minify")({ sourcemap: true })
-const resolvePlugin = require("rollup-plugin-node-resolve")();
-const uglifyPlugin = require("rollup-plugin-uglify").uglify;
-const visualizerPlugin = require("rollup-plugin-visualizer");
+const resolvePlugin = require("@rollup/plugin-node-resolve")();
+const terserPlugin = require("@rollup/plugin-terser").default;
+const visualizerPlugin = require("rollup-plugin-visualizer").visualizer;
 
 module.exports = function config(options) {
   if (Array.isArray(options)) {
@@ -65,7 +64,6 @@ module.exports = function config(options) {
       tsconfig,
       "sourceMap": true,
     }),
-    minifyPlugin,
     replacePlugin
   ]);
 
@@ -83,8 +81,8 @@ module.exports = function config(options) {
         }
       }
       })();`);
-    nextPlugins.push(uglifyPlugin({
-      sourcemap: true,
+    nextPlugins.push(terserPlugin({
+      sourceMap: true,
       output: {
         comments: uglifyFunction,
       },
@@ -107,7 +105,7 @@ module.exports = function config(options) {
       format: "es",
       freeze: false,
       esModule: false,
-      interop: false,
+      interop: "default",
       globals: external,
       format,
       name,

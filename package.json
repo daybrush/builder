@@ -1,6 +1,6 @@
 {
   "name": "@daybrush/builder",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,14 +17,12 @@
   },
   "homepage": "https://github.com/daybrush/builder#readme",
   "dependencies": {
-    "@daybrush/rollup-plugin-prototype-minify": "^1.1.2",
-    "rollup": "^1.7.4",
-    "rollup-plugin-commonjs": "^9.3.4",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-prototype-minify": "^1.1.0",
-    "rollup-plugin-replace": "^2.1.1",
-    "rollup-plugin-typescript": "^1.0.1",
-    "rollup-plugin-uglify": "^6.0.2",
-    "rollup-plugin-visualizer": "^1.1.0"
+    "@rollup/plugin-commonjs": "^23.0.4",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-terser": "^0.2.0",
+    "@rollup/plugin-typescript": "^10.0.1",
+    "rollup": "^3.7.1",
+    "rollup-plugin-visualizer": "^5.8.3"
   }
 }
