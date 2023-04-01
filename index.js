@@ -19,8 +19,10 @@ author: ${pkg.author ? pkg.author.name || pkg.author : ""}
 repository: ${pkg.repository.url}
 version: ${pkg.version}
 */`;
+const prototypeMinify = require("rollup-plugin-prototype-minify");
 const commonjsPlugin = require("@rollup/plugin-commonjs")();
 const typescriptPlugin = require("@rollup/plugin-typescript");
+const typescriptPlugin2 = require("rollup-plugin-typescript2");
 const replacePlugin = require("@rollup/plugin-replace")({
   "#__VERSION__#": pkg.version,
   "/** @class */": "/*#__PURE__*/",
@@ -45,6 +47,8 @@ module.exports = function config(options) {
     input,
     output, // string | string[]
     tsconfig = "tsconfig.json",
+    tsconfigOverride,
+    typescript2 = false,
     format = "umd", // "umd", "cjs", "es"
     exports = "default", // "default", "named"
     sourcemap = true, // boolean,
@@ -58,17 +62,37 @@ module.exports = function config(options) {
     inputOptions, // other input options
     outputOptions, // other output options
     banner = defaultBanner,
+    minifyPrototype, // minify prototype
   } = options;
-  const nextPlugins = plugins.concat([
-    typescriptPlugin({
+  const nextPlugins = [
+    ...plugins,
+  ];
+
+  if (typescript2) {
+    nextPlugins.push(typescriptPlugin2({
+      tsconfig,
+      tsconfigOverride: tsconfigOverride || {
+        compilerOptions: {
+          sourceMap: sourcemap,
+        },
+      },
+    }));
+  } else {
+    nextPlugins.push(typescriptPlugin({
       tsconfig,
       "sourceMap": true,
-    }),
-    replacePlugin
-  ]);
+    }));
+  }
+  nextPlugins.push(replacePlugin);
 
+  nextPlugins.push(...plugins);
+  minifyPrototype && nextPlugins.push(prototypeMinify({
+    sourcemap,
+    exclude: /node_modules/g,
+  }));
   commonjs && nextPlugins.push(commonjsPlugin);
   resolve && nextPlugins.push(resolvePlugin);
+
   if (uglify) {
     const condition = typeof uglify === "string" ? uglify : `name:(\\s*)${pkg.name.replace(/\//g, "\\/")}`;
     const uglifyFunction = eval(`(function () {

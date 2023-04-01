@@ -1,6 +1,6 @@
 {
   "name": "@daybrush/builder",
-  "version": "0.2.0",
+  "version": "0.2.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,10 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-terser": "^0.2.0",
-    "@rollup/plugin-typescript": "^10.0.1",
     "rollup": "^3.7.1",
+    "rollup-plugin-prototype-minify": "^1.1.0",
+    "@rollup/plugin-typescript": "^10.0.1",
+    "rollup-plugin-typescript2": "^0.34.1",
     "rollup-plugin-visualizer": "^5.8.3"
   }
 }
